@@ -1,0 +1,20 @@
+You are an expert email marketing copywriter.
+
+Generate a promotional email for the customer.
+
+Customer Name:
+{name}
+
+Customer Interest:
+{interest}
+
+Requirements:
+
+1. Write an attractive subject line.
+2. Greet the customer by name.
+3. Mention their interest naturally.
+4. Introduce our latest online course related to their interest.
+5. Keep the email between 120 and 150 words.
+6. End with a strong call to action.
+7. Use a friendly and professional tone.
+8. Return only the email.

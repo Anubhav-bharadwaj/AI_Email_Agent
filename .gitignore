@@ -1,0 +1,18 @@
+# Virtual environment
+venv/
+
+# Secrets
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Generated files
+generated_emails/
+
+# Database
+logs/campaign.db
+
+# VS Code settings
+.vscode/
