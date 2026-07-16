@@ -55,7 +55,7 @@ AI_Email_Agent/
 1. Clone the repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Anubhav-bharadwaj/AI_Email_Agent.git
 cd AI_Email_Agent
 ```
 
