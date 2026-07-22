@@ -58,7 +58,11 @@ if uploaded_file is not None:
             interest = row["Interest"]
 
             if validate_email(email):
-                email_text = generate_email(name, interest)
+                try:
+                    email_text = generate_email(name, interest)
+                except Exception as e:
+                    st.warning(f"⚠️ Failed to generate email for {name} ({email}): {e}")
+                    continue
                 st.session_state.generated_emails[email] = {
                     "name": name,
                     "content": email_text

@@ -23,7 +23,11 @@ for index, row in customers.iterrows():
         print("=" * 70)
         print(f"Generating email for: {name}")
 
-        ai_email = generate_email(name, interest)
+        try:
+            ai_email = generate_email(name, interest)
+        except Exception as e:
+            print(f"❌ Failed to generate email for {name} ({email}): {e}")
+            continue
 
         save_email(name, ai_email)
 
