@@ -1,3 +1,4 @@
+import pandas as pd
 from modules.data_loader import load_customers
 from modules.validator import validate_email
 from modules.email_generator import generate_email
@@ -8,8 +9,17 @@ from modules.email_sender import send_email
 from modules.utils import extract_subject_and_body
 
 # Load customer data
-customers = load_customers("data/customers.csv")
+try:
+    customers = load_customers("data/customers.csv")
+except pd.errors.EmptyDataError:
+    print("❌ The CSV file is empty. Please provide a file with data.")
+    exit(1)
+except ValueError as e:
+    print(f"❌ {e}")
+    exit(1)
+
 initialize_database()
+
 
 for index, row in customers.iterrows():
 
