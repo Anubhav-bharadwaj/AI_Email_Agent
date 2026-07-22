@@ -1,6 +1,7 @@
 import os
 import smtplib
 from email.message import EmailMessage
+from email.utils import formataddr
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -8,7 +9,7 @@ load_dotenv()
 
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
-
+SENDER_NAME = os.getenv("SENDER_NAME") 
 
 def send_email(receiver_email, subject, body):
 
@@ -16,7 +17,10 @@ def send_email(receiver_email, subject, body):
 
         msg = EmailMessage()
 
-        msg["From"] = EMAIL_ADDRESS
+        if SENDER_NAME:
+            msg["From"] = formataddr((SENDER_NAME, EMAIL_ADDRESS))
+        else:
+            msg["From"] = EMAIL_ADDRESS
         msg["To"] = receiver_email
         msg["Subject"] = subject
 
