@@ -1,8 +1,10 @@
+import os
 import sqlite3
 
 
 def initialize_database():
 
+    os.makedirs("logs", exist_ok=True)
     connection = sqlite3.connect("logs/campaign.db")
 
     cursor = connection.cursor()
@@ -24,6 +26,8 @@ def initialize_database():
 
 
 def log_campaign(name, email, interest, status):
+
+    os.makedirs("logs", exist_ok=True)
 
     connection = sqlite3.connect("logs/campaign.db")
 

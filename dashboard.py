@@ -7,7 +7,9 @@ from modules.file_manager import save_email
 from modules.email_sender import send_email
 from modules.utils import extract_subject_and_body
 from modules.database import (get_campaign_history,clear_campaign_history)
-from modules.logger import log_campaign
+from modules.logger import log_campaign, initialize_database
+
+initialize_database()
 
 st.set_page_config(
     page_title="AI Email Campaign Automation",
@@ -32,6 +34,7 @@ uploaded_file = st.file_uploader(
 if uploaded_file is not None:
 
     customers = pd.read_csv(uploaded_file)
+    customers = customers.drop_duplicates(subset="Email", keep="first")
     st.success("CSV Loaded Successfully!")
     col1, col2 = st.columns(2)
     col1.metric(

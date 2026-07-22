@@ -1,9 +1,12 @@
+import os
 import sqlite3
 import pandas as pd
 
 
 def get_campaign_history():
 
+    os.makedirs("logs", exist_ok=True)
+    
     connection = sqlite3.connect("logs/campaign.db")
 
     query = """
@@ -20,6 +23,8 @@ def get_campaign_history():
 
 
 def clear_campaign_history():
+
+    os.makedirs("logs", exist_ok=True)
 
     connection = sqlite3.connect("logs/campaign.db")
 
