@@ -15,7 +15,11 @@ Requirements:
 - Personalize using the customer's name.
 - Mention their interest naturally.
 - Introduce an online course related to their interest.
-- Highlight 3 clear benefits.
+- After introducing the course, include a section titled:
+  Why You'll Love This Course:
+    - List EXACTLY 3 benefits using bullet points.
+    - Each bullet should start with "•".
+    - Each benefit should be one concise sentence.
 - Use short paragraphs.
 - Keep a professional yet friendly tone.
 - Use persuasive marketing language.

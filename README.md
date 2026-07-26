@@ -1,6 +1,6 @@
 # 📧 AI Email Campaign Automation Agent
 
-An AI-powered email campaign automation system built with Python, Streamlit, and the Google Gemini API.
+An AI-powered email campaign automation system built with Python, Streamlit, and the Groq API.
 
 The application generates personalized marketing emails based on customer interests, allows users to preview generated drafts, sends emails through Gmail SMTP, and maintains a campaign history using SQLite.
 
@@ -9,7 +9,7 @@ The application generates personalized marketing emails based on customer intere
 ## ✨ Features
 
 - 📂 Upload customer data using a CSV file
-- 🤖 Generate personalized emails with Google Gemini AI
+- 🤖 Generate personalized emails with Groq API
 - 👀 Preview generated email drafts
 - 📧 Send emails directly from the dashboard
 - 🗂 Save generated drafts locally
@@ -23,7 +23,7 @@ The application generates personalized marketing emails based on customer intere
 
 - Python
 - Streamlit
-- Google Gemini API
+- Groq API
 - Pandas
 - SQLite
 - SMTP (Gmail)

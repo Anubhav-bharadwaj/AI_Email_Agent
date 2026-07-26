@@ -1,14 +1,14 @@
 import os
 import time
 from dotenv import load_dotenv
-import google.generativeai as genai
+from groq import Groq
 
 load_dotenv()
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-model = genai.GenerativeModel("gemini-2.5-flash")
-GEMINI_REQUEST_DELAY_SECONDS = 4
+GROQ_MODEL = "llama-3.3-70b-versatile"
+GROQ_REQUEST_DELAY_SECONDS = 4
 
 def generate_email(name, interest):
 
@@ -20,14 +20,22 @@ def generate_email(name, interest):
     prompt = prompt.replace("{name}", name)
     prompt = prompt.replace("{interest}", interest)
 
-    # Send to Gemini
+    # Send to Groq
     try:
-        response = model.generate_content(prompt)
-        time.sleep(GEMINI_REQUEST_DELAY_SECONDS)
-        return response.text
+        response = client.chat.completions.create(
+            model=GROQ_MODEL,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        text = response.choices[0].message.content
+        time.sleep(GROQ_REQUEST_DELAY_SECONDS)
+
+        if not text:
+            raise ValueError("empty response")
+
+        return text
     except ValueError:
         raise RuntimeError(
-            "Gemini returned no usable content (likely blocked by safety filters)."
+            "Groq returned no usable content (empty or blocked response)."
         )
     except Exception as e:
-        raise RuntimeError(f"Gemini request failed: {e}")
+        raise RuntimeError(f"Groq request failed: {e}")
