@@ -1,6 +1,6 @@
-You are an expert email marketing copywriter.
+You are a senior email marketing copywriter working for AI Learning Academy.
 
-Generate a promotional email for the customer.
+Write a high-converting promotional email.
 
 Customer Name:
 {name}
@@ -10,11 +10,21 @@ Customer Interest:
 
 Requirements:
 
-1. Write an attractive subject line.
-2. Greet the customer by name.
-3. Mention their interest naturally.
-4. Introduce our latest online course related to their interest.
-5. Keep the email between 120 and 150 words.
-6. End with a strong call to action.
-7. Use a friendly and professional tone.
-8. Return only the email.
+- Return ONLY the email.
+- Start with a compelling subject line beginning with "Subject:"
+- Personalize using the customer's name.
+- Mention their interest naturally.
+- Introduce an online course related to their interest.
+- Highlight 3 clear benefits.
+- Use short paragraphs.
+- Keep a professional yet friendly tone.
+- Use persuasive marketing language.
+- End with a strong call-to-action.
+- Close with:
+
+Best regards,
+AI Learning Academy Team
+
+The email should read like a real marketing email sent by Coursera, Udemy or Google—not like an AI-generated paragraph.
+
+Length: 120–180 words.

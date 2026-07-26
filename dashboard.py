@@ -90,10 +90,16 @@ if uploaded_file is not None:
     else:
         st.info("No drafts generated yet.")
 
+    dry_run = st.checkbox("🧪 Dry Run (preview only, skip actual sending)")
+    confirm_send = dry_run or st.checkbox(
+        f"🚀 I confirm I want to send {len(st.session_state.generated_emails)} real email(s) now."
+    )
+
     if st.button(
     "📧 Send Emails",
-    disabled=len(st.session_state.generated_emails) == 0
+    disabled=(len(st.session_state.generated_emails) == 0 or not confirm_send)
     ):
+        
         sent_count = 0
         failed_count = 0
         progress = st.progress(0)
@@ -116,7 +122,10 @@ if uploaded_file is not None:
                     continue
                 subject, body = extract_subject_and_body(draft["content"])
 
-                if send_email(email, subject, body):
+                if dry_run:
+                    sent_count += 1
+                    st.info(f"🧪 [Dry Run] Would send to {name} ({email})")
+                elif send_email(email, subject, body):
                     sent_count += 1
                     log_campaign(
                         name,
