@@ -36,8 +36,20 @@ def send_email(receiver_email, subject, body):
 
         return True
 
+    except smtplib.SMTPException as e:
+
+        print(f"❌ SMTP error while sending to {receiver_email}: {e}")
+
+        return False
+
+    except OSError as e:
+
+        print(f"❌ Network/connection error while sending to {receiver_email}: {e}")
+
+        return False
+
     except Exception as e:
 
-        print(f"❌ Failed to send email: {e}")
+        print(f"❌ Unexpected error while sending to {receiver_email}: {e}")
 
         return False

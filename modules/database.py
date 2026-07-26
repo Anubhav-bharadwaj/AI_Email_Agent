@@ -37,3 +37,22 @@ def clear_campaign_history():
 
     connection.commit()
     connection.close()
+
+def is_already_sent(email):
+
+    os.makedirs("logs", exist_ok=True)
+
+    connection = sqlite3.connect("logs/campaign.db")
+
+    cursor = connection.cursor()
+
+    cursor.execute(
+        "SELECT 1 FROM campaign_logs WHERE email = ? AND status = 'Sent' LIMIT 1",
+        (email,)
+    )
+
+    result = cursor.fetchone()
+
+    connection.close()
+
+    return result is not None

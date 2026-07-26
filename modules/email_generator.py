@@ -20,6 +20,12 @@ def generate_email(name, interest):
     prompt = prompt.replace("{interest}", interest)
 
     # Send to Gemini
-    response = model.generate_content(prompt)
-
-    return response.text
+    try:
+        response = model.generate_content(prompt)
+        return response.text
+    except ValueError:
+        raise RuntimeError(
+            "Gemini returned no usable content (likely blocked by safety filters)."
+        )
+    except Exception as e:
+        raise RuntimeError(f"Gemini request failed: {e}")

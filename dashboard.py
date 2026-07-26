@@ -6,7 +6,7 @@ from modules.email_generator import generate_email
 from modules.file_manager import save_email
 from modules.email_sender import send_email
 from modules.utils import extract_subject_and_body
-from modules.database import (get_campaign_history,clear_campaign_history)
+from modules.database import (get_campaign_history,clear_campaign_history,is_already_sent)
 from modules.logger import log_campaign, initialize_database
 from modules.data_loader import validate_customer_columns
 
@@ -107,6 +107,9 @@ if uploaded_file is not None:
             interest = row["Interest"]
 
             if validate_email(email):
+                if is_already_sent(email):
+                    st.warning(f"⏭️ Skipping {name} ({email}) — already marked as Sent.")
+                    continue
                 draft = st.session_state.generated_emails.get(email)
                 if draft is None:
                     st.warning(f"No draft found for {name}. Please generate emails first.")

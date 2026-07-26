@@ -1,5 +1,6 @@
 import pandas as pd
 from modules.data_loader import load_customers
+from modules.database import is_already_sent
 from modules.validator import validate_email
 from modules.email_generator import generate_email
 from modules.file_manager import save_email
@@ -29,6 +30,10 @@ for index, row in customers.iterrows():
 
     # Validate email
     if validate_email(email):
+
+        if is_already_sent(email):
+            print(f"⏭️ Skipping {name} ({email}) — already marked as Sent.")
+            continue
 
         print("=" * 70)
         print(f"Generating email for: {name}")
