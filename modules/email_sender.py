@@ -1,4 +1,5 @@
 import os
+import time
 import smtplib
 from email.message import EmailMessage
 from email.utils import formataddr
@@ -10,6 +11,8 @@ load_dotenv()
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 SENDER_NAME = os.getenv("SENDER_NAME") 
+
+SMTP_SEND_DELAY_SECONDS = 2
 
 def send_email(receiver_email, subject, body):
 
@@ -33,7 +36,8 @@ def send_email(receiver_email, subject, body):
             smtp.send_message(msg)
 
         print(f"✅ Email sent to {receiver_email}")
-
+        time.sleep(SMTP_SEND_DELAY_SECONDS)
+        
         return True
 
     except smtplib.SMTPException as e:
