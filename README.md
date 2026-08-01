@@ -1,4 +1,4 @@
-# 📧 AI Email Campaign Automation Agent
+# 📧 MailForge AI
 
 An AI-powered email campaign automation system built with Python, Streamlit, and the Groq API.
 
