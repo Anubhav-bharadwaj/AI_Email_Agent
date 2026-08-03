@@ -3,16 +3,30 @@ venv/
 
 # Secrets
 .env
+frontend/.env
 
 # Python cache
 __pycache__/
 *.pyc
+.pytest_cache/
+.mypy_cache/
 
 # Generated files
 generated_emails/
 
 # Database
 logs/campaign.db
+logs/*.log
+
 
 # VS Code settings
 .vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# React
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/

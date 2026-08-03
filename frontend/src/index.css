@@ -1,0 +1,163 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter";
+
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: 'Inter Variable', sans-serif;
+  
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-foreground: var(--accent-foreground);
+  
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Sidebar */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Custom Box Shadows for glowing elements */
+  --shadow-glow-sm: 0 0 10px rgba(124, 58, 237, 0.2);
+  --shadow-glow-md: 0 0 20px rgba(124, 58, 237, 0.3);
+  --shadow-glow-lg: 0 0 30px rgba(124, 58, 237, 0.4);
+}
+
+@layer base {
+  :root {
+    /* Using Dark mode as default/only mode as requested (Dark-first design) */
+    --background: #0B0F19;
+    --foreground: #F9FAFB;
+    
+    --card: #161B22;
+    --card-foreground: #F9FAFB;
+    
+    --popover: #111827;
+    --popover-foreground: #F9FAFB;
+    
+    --primary: #F9FAFB;
+    --primary-foreground: #0B0F19;
+    
+    --secondary: #111827;
+    --secondary-foreground: #9CA3AF;
+    
+    --muted: #111827;
+    --muted-foreground: #6B7280;
+    
+    --accent: #7C3AED;
+    --accent-hover: #8B5CF6;
+    --accent-foreground: #F9FAFB;
+    
+    --destructive: #EF4444;
+    --success: #22C55E;
+    --warning: #F59E0B;
+    
+    --border: rgba(255,255,255,0.08);
+    --input: rgba(255,255,255,0.08);
+    --ring: rgba(124, 58, 237, 0.5); /* Accent with opacity */
+
+    --radius: 0.75rem; /* 12px default */
+    
+    --sidebar: #111827;
+    --sidebar-foreground: #9CA3AF;
+    --sidebar-primary: #7C3AED;
+    --sidebar-primary-foreground: #F9FAFB;
+    --sidebar-accent: #161B22;
+    --sidebar-accent-foreground: #F9FAFB;
+    --sidebar-border: rgba(255,255,255,0.08);
+    --sidebar-ring: rgba(124, 58, 237, 0.5);
+  }
+
+  .dark {
+    /* Same as root because it is a dark-first design, keeping dark class for compatibility */
+    --background: #0B0F19;
+    --foreground: #F9FAFB;
+    --card: #161B22;
+    --card-foreground: #F9FAFB;
+    --popover: #111827;
+    --popover-foreground: #F9FAFB;
+    --primary: #F9FAFB;
+    --primary-foreground: #0B0F19;
+    --secondary: #111827;
+    --secondary-foreground: #9CA3AF;
+    --muted: #111827;
+    --muted-foreground: #6B7280;
+    --accent: #7C3AED;
+    --accent-hover: #8B5CF6;
+    --accent-foreground: #F9FAFB;
+    --destructive: #EF4444;
+    --success: #22C55E;
+    --warning: #F59E0B;
+    --border: rgba(255,255,255,0.08);
+    --input: rgba(255,255,255,0.08);
+    --ring: rgba(124, 58, 237, 0.5);
+    
+    --sidebar: #111827;
+    --sidebar-foreground: #9CA3AF;
+    --sidebar-primary: #7C3AED;
+    --sidebar-primary-foreground: #F9FAFB;
+    --sidebar-accent: #161B22;
+    --sidebar-accent-foreground: #F9FAFB;
+    --sidebar-border: rgba(255,255,255,0.08);
+    --sidebar-ring: rgba(124, 58, 237, 0.5);
+  }
+
+  * {
+    border-color: var(--border);
+    outline-color: var(--ring);
+  }
+  
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    /* By default ensure dark mode is forced on body if not handled by next-themes */
+    color-scheme: dark;
+  }
+  
+  html {
+    font-family: var(--font-sans);
+  }
+
+  /* Utility classes for glassmorphism */
+  .glass {
+    @apply bg-background/60 backdrop-blur-xl border border-border;
+  }
+  
+  .glass-card {
+    @apply bg-card/60 backdrop-blur-xl border border-border;
+  }
+}
