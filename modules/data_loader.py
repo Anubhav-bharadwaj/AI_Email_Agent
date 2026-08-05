@@ -28,4 +28,6 @@ def validate_customer_columns(customers):
         column_map[req.lower()]: req
         for req in REQUIRED_COLUMNS
     }
-    return customers.rename(columns=rename_map)
+    customers = customers.rename(columns=rename_map)
+    customers[REQUIRED_COLUMNS] = customers[REQUIRED_COLUMNS].fillna("")
+    return customers

@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { UploadCloud, CheckCircle2, Copy, Search, Mail, Monitor, Smartphone, Type, FileCode2, Sparkles, Send, FileSpreadsheet } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCampaignStore } from '@/store/campaignStore';
-import { mockUploadCsv, mockGenerateDrafts, mockSendCampaign } from '@/services/api';
+import { uploadCsv, startGenerate, getGenerateStatus, startSend, getSendStatus } from '@/services/api';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -50,21 +50,35 @@ export function CampaignBuilder() {
 
     toast.info('Analyzing CSV data...');
     try {
-      const res = await mockUploadCsv(file);
+      const res = await uploadCsv(file);
       setCustomers(res.customers);
       toast.success('CSV parsed successfully');
       setStep(2);
     } catch (error) {
-      toast.error('Failed to parse CSV');
+      const message = error.response?.data?.detail || 'Failed to parse CSV';
+      toast.error(message);
     }
   };
 
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
-      const res = await mockGenerateDrafts(customers);
-      setDrafts(res.drafts);
-      if (res.drafts.length > 0) setSelectedDraftId(res.drafts[0].id);
+      const { jobId } = await startGenerate(customers);
+
+      let job;
+      do {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        job = await getGenerateStatus(jobId);
+      } while (job.status === 'running');
+
+      if (job.errors?.length > 0) {
+        job.errors.forEach((err) =>
+          toast.error(`Failed to generate for ${err.name}: ${err.error}`)
+        );
+      }
+
+      setDrafts(job.drafts);
+      if (job.drafts.length > 0) setSelectedDraftId(job.drafts[0].id);
       toast.success('AI Drafts generated');
       setStep(3);
     } catch (error) {
@@ -77,15 +91,24 @@ export function CampaignBuilder() {
   const handleSend = async () => {
     setIsSending(true);
     toast.info('Dispatching campaign...');
+    const startTime = Date.now();
     try {
-      const res = await mockSendCampaign(drafts, isDryRun);
+      const { jobId } = await startSend(customers, drafts, isDryRun);
+
+      let job;
+      do {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        job = await getSendStatus(jobId);
+      } while (job.status === 'running');
+
+      const seconds = Math.round((Date.now() - startTime) / 1000);
       setSummary({
         totalCustomers: customers.length,
         generated: drafts.length,
-        sent: res.sent,
-        failed: res.failed,
-        skipped: 0,
-        duration: '1m 24s'
+        sent: job.sent,
+        failed: job.failed,
+        skipped: job.skipped,
+        duration: `${Math.floor(seconds / 60)}m ${seconds % 60}s`
       });
       setStep(4);
     } catch (error) {

@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Search, Trash2, Calendar, FileText, Download } from 'lucide-react';
-import { mockGetHistory, mockClearHistory } from '@/services/api';
+import { getHistory, clearHistory } from '@/services/api';
 
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
@@ -18,19 +18,29 @@ export function History() {
   const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
-    mockGetHistory().then((res) => {
-      setLogs(res.logs);
-      setLoading(false);
-    });
+    getHistory()
+      .then((res) => {
+        setLogs(res.logs);
+        setLoading(false);
+      })
+      .catch(() => {
+        toast.error('Failed to load campaign history');
+        setLoading(false);
+      });
   }, []);
 
   const handleClear = async () => {
     if (confirm('Are you sure you want to clear all history? This cannot be undone.')) {
       setLoading(true);
-      await mockClearHistory();
-      setLogs([]);
-      setLoading(false);
-      toast.success('History cleared successfully');
+      try {
+        await clearHistory();
+        setLogs([]);
+        toast.success('History cleared successfully');
+      } catch {
+        toast.error('Failed to clear history');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 

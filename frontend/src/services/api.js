@@ -1,48 +1,44 @@
+import api from '@/lib/axios';
 
 // Simulate an async request
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export const mockUploadCsv = async (_file) => {
-  await delay(1000);
-  return {
-    customers: [
-    { id: '1', name: 'Alice Smith', email: 'alice@example.com', interest: 'AI Marketing' },
-    { id: '2', name: 'Bob Jones', email: 'bob@example.com', interest: 'Sales Automation' },
-    { id: '3', name: 'Charlie Brown', email: 'charlie@example.com', interest: 'Data Analytics' }]
-
-  };
+export const uploadCsv = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await api.post('/customers/upload', formData, {
+    headers: { 'Content-Type': undefined }
+  });
+  return response.data;
 };
 
-export const mockGenerateDrafts = async (customers) => {
-  await delay(2000);
-  const drafts = customers.map((c) => ({
-    id: `draft_${c.id}`,
-    customerId: c.id,
-    subject: `Boost your ${c.interest} with MailForge AI`,
-    bodyPlain: `Hi ${c.name},\n\nWe noticed your interest in ${c.interest}. MailForge AI can help you scale.\n\nBest,\nMailForge Team`,
-    bodyHtml: `<html><body><p>Hi ${c.name},</p><p>We noticed your interest in <strong>${c.interest}</strong>. MailForge AI can help you scale.</p><p>Best,<br/>MailForge Team</p></body></html>`
-  }));
-  return { drafts };
+export const startGenerate = async (customers) => {
+  const response = await api.post('/campaigns/generate', { customers });
+  return response.data;
 };
 
-export const mockSendCampaign = async (drafts, _isDryRun) => {
-  await delay(3000);
-  return { success: true, sent: drafts.length - (drafts.length > 1 ? 1 : 0), failed: drafts.length > 1 ? 1 : 0 };
+export const getGenerateStatus = async (jobId) => {
+  const response = await api.get(`/campaigns/generate/status/${jobId}`);
+  return response.data;
 };
 
-export const mockGetHistory = async () => {
-  await delay(500);
-  return {
-    logs: [
-    { id: '101', name: 'David Lee', email: 'david@test.com', interest: 'SEO', status: 'Sent', timestamp: new Date(Date.now() - 86400000).toISOString() },
-    { id: '102', name: 'Emma Watson', email: 'emma@test.com', interest: 'Ads', status: 'Failed', timestamp: new Date(Date.now() - 80000000).toISOString() },
-    { id: '103', name: 'Frank Ocean', email: 'frank@test.com', interest: 'Music', status: 'Skipped', timestamp: new Date(Date.now() - 70000000).toISOString() }]
-
-  };
+export const startSend = async (customers, drafts, isDryRun) => {
+  const response = await api.post('/campaigns/send', { customers, drafts, isDryRun });
+  return response.data;
 };
 
-export const mockClearHistory = async () => {
-  await delay(800);
+export const getSendStatus = async (jobId) => {
+  const response = await api.get(`/campaigns/send/status/${jobId}`);
+  return response.data;
+};
+
+export const getHistory = async () => {
+  const response = await api.get('/history');
+  return { logs: response.data };
+};
+
+export const clearHistory = async () => {
+  await api.delete('/history');
   return { success: true };
 };
 

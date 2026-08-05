@@ -16,10 +16,18 @@ def initialize_database():
         customer_name TEXT,
         email TEXT,
         interest TEXT,
-        status TEXT
+        status TEXT,
+        timestamp TEXT DEFAULT CURRENT_TIMESTAMP
 
     )
     """)
+
+    try:
+        cursor.execute(
+            "ALTER TABLE campaign_logs ADD COLUMN timestamp TEXT DEFAULT CURRENT_TIMESTAMP"
+        )
+    except sqlite3.OperationalError:
+        pass
 
     connection.commit()
     connection.close()
