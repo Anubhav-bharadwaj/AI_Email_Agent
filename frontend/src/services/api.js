@@ -42,6 +42,11 @@ export const clearHistory = async () => {
   return { success: true };
 };
 
+export const getDashboardSummary = async () => {
+  const response = await api.get('/dashboard/summary');
+  return response.data;
+};
+
 const defaultSettings = {
   smtpHost: 'smtp.mailtrap.io',
   smtpPort: 2525,

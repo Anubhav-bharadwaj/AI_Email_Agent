@@ -1,17 +1,11 @@
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Users, Mail, XCircle, SkipForward, CheckCircle2, TrendingUp, TrendingDown, Clock, ArrowRight, Sparkles, Send } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { buttonVariants } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
-
-const stats = [
-{ title: 'Total Customers', value: '12,450', icon: Users, trend: '+12%', isPositive: true },
-{ title: 'Drafts Generated', value: '45,231', icon: Sparkles, trend: '+24%', isPositive: true },
-{ title: 'Emails Sent', value: '44,980', icon: Send, trend: '+8%', isPositive: true },
-{ title: 'Failed Emails', value: '120', icon: XCircle, trend: '-2%', isPositive: true, textClass: 'text-destructive' },
-{ title: 'Skipped', value: '131', icon: SkipForward, trend: '+1%', isPositive: false },
-{ title: 'Success Rate', value: '99.4%', icon: CheckCircle2, trend: '+0.2%', isPositive: true, textClass: 'text-success' }];
+import { getDashboardSummary } from '@/services/api';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -27,6 +21,22 @@ const itemVariants = {
 };
 
 export function Dashboard() {
+  const [summary, setSummary] = useState(null);
+
+  useEffect(() => {
+    getDashboardSummary()
+      .then(setSummary)
+      .catch(() => setSummary(null));
+  }, []);
+
+  const stats = [
+  { title: 'Customers Contacted', value: summary ? summary.customersContacted.toLocaleString() : '—', icon: Users, trend: '+12%', isPositive: true },
+  { title: 'Drafts Generated', value: '—', icon: Sparkles, trend: '+24%', isPositive: true },
+  { title: 'Emails Sent', value: summary ? summary.emailsSent.toLocaleString() : '—', icon: Send, trend: '+8%', isPositive: true },
+  { title: 'Failed Emails', value: summary ? summary.failedEmails.toLocaleString() : '—', icon: XCircle, trend: '-2%', isPositive: true, textClass: 'text-destructive' },
+  { title: 'Skipped', value: summary ? summary.skipped.toLocaleString() : '—', icon: SkipForward, trend: '+1%', isPositive: false },
+  { title: 'Success Rate', value: summary ? `${summary.successRate}%` : '—', icon: CheckCircle2, trend: '+0.2%', isPositive: true, textClass: 'text-success' }];
+
   return (
     <motion.div
       variants={containerVariants}

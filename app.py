@@ -33,6 +33,7 @@ for index, row in customers.iterrows():
 
         if is_already_sent(email):
             print(f"⏭️ Skipping {name} ({email}) — already marked as Sent.")
+            log_campaign(name, email, interest, "Skipped")
             continue
 
         print("=" * 70)

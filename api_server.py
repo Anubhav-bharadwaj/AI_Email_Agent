@@ -108,6 +108,7 @@ def _run_send_job(job_id, customers, drafts, is_dry_run):
 
         if is_already_sent(email):
             skipped += 1
+            log_campaign(name, email, interest, "Skipped")
             send_jobs[job_id]["completed"] += 1
             continue
 
@@ -244,3 +245,23 @@ def get_send_status(job_id: str):
     if not job:
         raise HTTPException(status_code=404, detail="Job not found.")
     return job
+
+@app.get("/api/dashboard/summary")
+def get_dashboard_summary():
+    history = get_campaign_history()
+
+    sent = int((history["status"] == "Sent").sum())
+    failed = int((history["status"] == "Failed").sum())
+    skipped = int((history["status"] == "Skipped").sum())
+    customers_contacted = int(history["email"].nunique())
+
+    total_attempts = sent + failed
+    success_rate = round((sent / total_attempts) * 100, 1) if total_attempts > 0 else 0
+
+    return {
+        "customersContacted": customers_contacted,
+        "emailsSent": sent,
+        "failedEmails": failed,
+        "skipped": skipped,
+        "successRate": success_rate,
+    }

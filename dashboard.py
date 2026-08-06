@@ -115,6 +115,7 @@ if uploaded_file is not None:
             if validate_email(email):
                 if is_already_sent(email):
                     st.warning(f"⏭️ Skipping {name} ({email}) — already marked as Sent.")
+                    log_campaign(name, email, interest, "Skipped")
                     continue
                 draft = st.session_state.generated_emails.get(email)
                 if draft is None:
