@@ -3,6 +3,7 @@ import pandas as pd
 import html
 import uuid
 import threading
+from datetime import datetime, timedelta
 from typing import List
 from pydantic import BaseModel
 from fastapi import FastAPI, UploadFile, File, HTTPException
@@ -265,3 +266,28 @@ def get_dashboard_summary():
         "skipped": skipped,
         "successRate": success_rate,
     }
+
+@app.get("/api/analytics/volume")
+def get_analytics_volume():
+    history = get_campaign_history()
+
+    if history.empty:
+        return []
+
+    history = history.copy()
+    history["date"] = pd.to_datetime(history["timestamp"], errors="coerce").dt.date
+
+    today = datetime.utcnow().date()
+    date_range = [today - timedelta(days=i) for i in range(6, -1, -1)]
+
+    result = []
+    for d in date_range:
+        day_rows = history[history["date"] == d]
+        result.append({
+            "name": d.strftime("%b %d"),
+            "sent": int((day_rows["status"] == "Sent").sum()),
+            "failed": int((day_rows["status"] == "Failed").sum()),
+            "skipped": int((day_rows["status"] == "Skipped").sum()),
+        })
+
+    return result

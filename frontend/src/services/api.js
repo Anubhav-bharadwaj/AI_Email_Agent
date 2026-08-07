@@ -47,6 +47,11 @@ export const getDashboardSummary = async () => {
   return response.data;
 };
 
+export const getAnalyticsVolume = async () => {
+  const response = await api.get('/analytics/volume');
+  return response.data;
+};
+
 const defaultSettings = {
   smtpHost: 'smtp.mailtrap.io',
   smtpPort: 2525,

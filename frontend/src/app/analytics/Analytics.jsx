@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { motion } from 'framer-motion';
+import { getAnalyticsVolume } from '@/services/api';
 
 const engagementData = [
 { name: 'Mon', deliveryRate: 99, openRate: 45, clickRate: 12 },
@@ -11,7 +13,7 @@ const engagementData = [
 { name: 'Sat', deliveryRate: 100, openRate: 42, clickRate: 10 },
 { name: 'Sun', deliveryRate: 99, openRate: 49, clickRate: 13 }];
 
-const volumeData = [
+const initialVolumeData = [
 { name: 'Mon', sent: 4000, failed: 240, skipped: 100 },
 { name: 'Tue', sent: 3000, failed: 139, skipped: 50 },
 { name: 'Wed', sent: 2000, failed: 980, skipped: 120 },
@@ -31,6 +33,14 @@ const itemVariants = {
 };
 
 export function Analytics() {
+  const [volumeData, setVolumeData] = useState(initialVolumeData);
+
+  useEffect(() => {
+    getAnalyticsVolume()
+      .then(setVolumeData)
+      .catch(() => {});
+  }, []);
+
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
       <div>
