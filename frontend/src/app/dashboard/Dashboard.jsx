@@ -20,6 +20,13 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 }
 };
 
+function getTimeBasedGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good Morning';
+  if (hour < 18) return 'Good Afternoon';
+  return 'Good Evening';
+}
+
 export function Dashboard() {
   const [summary, setSummary] = useState(null);
 
@@ -49,7 +56,7 @@ export function Dashboard() {
         <div className="absolute -top-24 -right-24 w-48 h-48 bg-accent/20 rounded-full blur-3xl pointer-events-none" />
         
         <div className="z-10">
-          <h1 className="text-3xl font-bold tracking-tight">Good Morning, Alex 👋</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{getTimeBasedGreeting()} 👋</h1>
           <p className="text-muted-foreground mt-2 max-w-lg text-sm">
             Ready to launch your next AI campaign? You have <strong className="text-foreground">2</strong> drafts pending review.
           </p>
