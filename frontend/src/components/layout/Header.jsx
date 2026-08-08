@@ -1,4 +1,4 @@
-import { Menu, Search, Bell, Moon, Command, ChevronDown } from 'lucide-react';
+import { Menu, Search, Bell, Moon, Command, ChevronDown, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -44,7 +44,9 @@ export function Header() {
         </Button>
         <div className="w-px h-6 bg-border mx-2" />
         <button className="flex items-center gap-2 hover:opacity-80 transition-opacity outline-none rounded-full focus-visible:ring-2 focus-visible:ring-ring">
-          <img src="https://i.pravatar.cc/150?img=11" alt="User" className="w-8 h-8 rounded-full border border-border/50 object-cover" />
+          <div className="w-8 h-8 rounded-full border border-border/50 bg-muted flex items-center justify-center">
+            <User className="w-4 h-4 text-muted-foreground" />
+          </div>
         </button>
       </div>
     </header>);
