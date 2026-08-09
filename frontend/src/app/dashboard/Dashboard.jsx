@@ -101,7 +101,10 @@ export function Dashboard() {
         <Card className="col-span-2 bg-card/60 backdrop-blur-sm border-border/50">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle>Recent Campaigns</CardTitle>
+              <div className="flex items-center gap-2">
+                <CardTitle>Recent Campaigns</CardTitle>
+                <Badge variant="outline" className="text-[10px] px-1.5 h-4">Demo Data</Badge>
+              </div>
               <CardDescription>Your latest email automation runs</CardDescription>
             </div>
             <Link to="/history" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
@@ -144,7 +147,10 @@ export function Dashboard() {
         {/* Activity Timeline */}
         <Card className="bg-card/60 backdrop-blur-sm border-border/50">
           <CardHeader>
-            <CardTitle>Activity</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle>Activity</CardTitle>
+              <Badge variant="outline" className="text-[10px] px-1.5 h-4">Demo Data</Badge>
+            </div>
             <CardDescription>Latest system events</CardDescription>
           </CardHeader>
           <CardContent>

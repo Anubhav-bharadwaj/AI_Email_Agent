@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, PlusCircle, History, BarChart, Settings, Sparkles, ChevronLeft, ChevronRight, HardDrive, Zap, Send } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, History, BarChart, Settings, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -86,38 +86,6 @@ export function Sidebar() {
           })}
         </nav>
 
-        {!isCollapsed &&
-        <div className="px-4 mt-auto mb-4">
-            <div className="rounded-xl border border-border/50 bg-background/50 p-4 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent to-accent-hover" />
-              <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-3">Workspace Usage</h4>
-              
-              <div className="space-y-3">
-                <div className="flex items-center text-xs">
-                  <Zap className="w-3.5 h-3.5 text-accent mr-2" />
-                  <span className="text-muted-foreground flex-1">Campaigns</span>
-                  <span className="font-medium">12 / 50</span>
-                </div>
-                
-                <div className="flex items-center text-xs">
-                  <Send className="w-3.5 h-3.5 text-success mr-2" />
-                  <span className="text-muted-foreground flex-1">Emails Sent</span>
-                  <span className="font-medium">45k / 100k</span>
-                </div>
-                
-                <div className="space-y-1.5 mt-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground flex items-center"><HardDrive className="w-3.5 h-3.5 mr-1" /> Storage</span>
-                    <span className="font-medium">2.4 GB</span>
-                  </div>
-                  <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-accent rounded-full" style={{ width: '45%' }} />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        }
       </div>
     </motion.aside>);
 
