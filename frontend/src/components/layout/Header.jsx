@@ -1,8 +1,11 @@
-import { Menu, Search, Bell, Moon, Command, ChevronDown, User } from 'lucide-react';
+import { Menu, Search, Bell, Moon, Sun, Command, ChevronDown, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useThemeStore } from '@/store/themeStore';
 
 export function Header() {
+  const { theme, toggleTheme } = useThemeStore();
+
   return (
     <header className="h-16 border-b border-border/50 bg-background/80 backdrop-blur-md flex items-center justify-between px-4 md:px-8 sticky top-0 z-40 w-full transition-all">
       <div className="flex items-center">
@@ -35,12 +38,11 @@ export function Header() {
       </div>
 
       <div className="flex items-center space-x-2">
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-          <Moon className="w-5 h-5" />
+        <Button variant="ghost" size="icon" onClick={toggleTheme} className="text-muted-foreground hover:text-foreground">
+          {theme === 'dark' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
         </Button>
-        <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground">
+        <Button variant="ghost" size="icon" disabled className="relative text-muted-foreground opacity-50 cursor-not-allowed">
           <Bell className="w-5 h-5" />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-accent rounded-full border border-background shadow-glow-sm" />
         </Button>
         <div className="w-px h-6 bg-border mx-2" />
         <button className="flex items-center gap-2 hover:opacity-80 transition-opacity outline-none rounded-full focus-visible:ring-2 focus-visible:ring-ring">

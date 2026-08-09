@@ -59,51 +59,51 @@
 
 @layer base {
   :root {
-    /* Using Dark mode as default/only mode as requested (Dark-first design) */
-    --background: #0B0F19;
-    --foreground: #F9FAFB;
+    /* Light theme (default when no .dark class is present on <html>) */
+    --background: #FFFFFF;
+    --foreground: #0B0F19;
     
-    --card: #161B22;
-    --card-foreground: #F9FAFB;
+    --card: #F9FAFB;
+    --card-foreground: #0B0F19;
     
-    --popover: #111827;
-    --popover-foreground: #F9FAFB;
+    --popover: #FFFFFF;
+    --popover-foreground: #0B0F19;
     
-    --primary: #F9FAFB;
-    --primary-foreground: #0B0F19;
+    --primary: #0B0F19;
+    --primary-foreground: #F9FAFB;
     
-    --secondary: #111827;
-    --secondary-foreground: #9CA3AF;
+    --secondary: #F3F4F6;
+    --secondary-foreground: #374151;
     
-    --muted: #111827;
+    --muted: #F3F4F6;
     --muted-foreground: #6B7280;
     
     --accent: #7C3AED;
-    --accent-hover: #8B5CF6;
+    --accent-hover: #6D28D9;
     --accent-foreground: #F9FAFB;
     
     --destructive: #EF4444;
     --success: #22C55E;
     --warning: #F59E0B;
     
-    --border: rgba(255,255,255,0.08);
-    --input: rgba(255,255,255,0.08);
+    --border: rgba(0,0,0,0.08);
+    --input: rgba(0,0,0,0.08);
     --ring: rgba(124, 58, 237, 0.5); /* Accent with opacity */
 
     --radius: 0.75rem; /* 12px default */
     
-    --sidebar: #111827;
-    --sidebar-foreground: #9CA3AF;
+    --sidebar: #F9FAFB;
+    --sidebar-foreground: #374151;
     --sidebar-primary: #7C3AED;
     --sidebar-primary-foreground: #F9FAFB;
-    --sidebar-accent: #161B22;
-    --sidebar-accent-foreground: #F9FAFB;
-    --sidebar-border: rgba(255,255,255,0.08);
+    --sidebar-accent: #F3F4F6;
+    --sidebar-accent-foreground: #0B0F19;
+    --sidebar-border: rgba(0,0,0,0.08);
     --sidebar-ring: rgba(124, 58, 237, 0.5);
   }
 
   .dark {
-    /* Same as root because it is a dark-first design, keeping dark class for compatibility */
+    /* Dark theme, applied when <html> has the .dark class */
     --background: #0B0F19;
     --foreground: #F9FAFB;
     --card: #161B22;
@@ -144,8 +144,6 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
-    /* By default ensure dark mode is forced on body if not handled by next-themes */
-    color-scheme: dark;
   }
   
   html {
