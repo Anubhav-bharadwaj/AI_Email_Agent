@@ -60,7 +60,6 @@ const defaultSettings = {
   apiProvider: 'Groq',
   groqApiKey: 'gsk_xxxxxx',
   rateLimit: 10,
-  defaultDryRun: true,
   theme: 'dark',
   companyName: 'Acme Corp',
   companyEmail: 'hello@acme.com'

@@ -189,12 +189,10 @@ export function Settings() {
               <CardTitle>System Preferences</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-center justify-between p-4 rounded-xl border border-border/50 bg-background/50 hover:border-accent/30 transition-colors">
-                <div className="space-y-1 mr-4">
-                  <Label className="text-base font-semibold">Safety Dry Run</Label>
-                  <p className="text-sm text-muted-foreground leading-relaxed">Require explicit manual confirmation to send emails. When enabled, campaigns default to Dry Run mode to simulate delivery without actual dispatch.</p>
-                </div>
-                <Switch checked={settings.defaultDryRun} onCheckedChange={(c) => setSettings({ ...settings, defaultDryRun: c })} />
+              <div className="p-4 rounded-xl border border-border/50 bg-background/50">
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  A persisted, global Dry Run preference will appear here once Settings backend persistence is implemented. For now, Dry Run is controlled directly on the Campaign Builder's dispatch step, where it actually takes effect.
+                </p>
               </div>
             </CardContent>
           </Card>
