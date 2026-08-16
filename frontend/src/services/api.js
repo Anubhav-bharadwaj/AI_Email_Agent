@@ -12,8 +12,8 @@ export const uploadCsv = async (file) => {
   return response.data;
 };
 
-export const startGenerate = async (customers) => {
-  const response = await api.post('/campaigns/generate', { customers });
+export const startGenerate = async (customers, tone = 'Professional') => {
+  const response = await api.post('/campaigns/generate', { customers, tone });
   return response.data;
 };
 
@@ -66,11 +66,20 @@ const defaultSettings = {
 };
 
 export const mockGetSettings = async () => {
-  await delay(500);
+  await delay(300);
+  const storedSettings = localStorage.getItem('mailforge_settings');
+  if (storedSettings) {
+    try {
+      return { ...defaultSettings, ...JSON.parse(storedSettings) };
+    } catch (e) {
+      console.error('Failed to parse stored settings', e);
+    }
+  }
   return { ...defaultSettings };
 };
 
-export const mockUpdateSettings = async (_settings) => {
-  await delay(1000);
+export const mockUpdateSettings = async (settings) => {
+  await delay(500);
+  localStorage.setItem('mailforge_settings', JSON.stringify(settings));
   return { success: true };
 };

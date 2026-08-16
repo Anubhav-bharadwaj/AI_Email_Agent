@@ -10,7 +10,8 @@ const navItems = [
 { name: 'New Campaign', path: '/campaign', icon: PlusCircle },
 { name: 'Analytics', path: '/analytics', icon: BarChart },
 { name: 'History', path: '/history', icon: History },
-{ name: 'Settings', path: '/settings', icon: Settings }];
+{ name: 'Settings', path: '/settings', icon: Settings },
+{ name: 'Streamlit App', path: 'http://localhost:8501', icon: Sparkles, external: true }];
 
 export function Sidebar() {
   const location = useLocation();
@@ -51,6 +52,31 @@ export function Sidebar() {
       <div className="flex-1 overflow-y-auto py-4 flex flex-col justify-between">
         <nav className="px-3 space-y-1">
           {navItems.map((item) => {
+            if (item.external) {
+              return (
+                <a
+                  key={item.path}
+                  href={item.path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    'relative flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors group',
+                    isCollapsed ? 'justify-center' : ''
+                  )}>
+                  <item.icon className={cn(
+                    "w-[18px] h-[18px] z-10 transition-colors shrink-0",
+                    "text-muted-foreground group-hover:text-foreground",
+                    isCollapsed ? "mx-auto" : "mr-3"
+                  )} />
+                  {!isCollapsed &&
+                    <span className="z-10 text-muted-foreground group-hover:text-foreground">
+                      {item.name}
+                    </span>
+                  }
+                </a>
+              );
+            }
+            
             const isActive = location.pathname === item.path || item.path !== '/' && location.pathname.startsWith(item.path);
             return (
               <Link

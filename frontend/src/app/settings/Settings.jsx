@@ -24,6 +24,8 @@ export function Settings() {
   useEffect(() => {
     mockGetSettings().then((res) => {
       setSettings(res);
+      if (res.logo) setLogoPreview(res.logo);
+      if (res.banner) setBannerPreview(res.banner);
       setLoading(false);
     });
   }, []);
@@ -41,8 +43,14 @@ export function Settings() {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        if (type === 'logo') setLogoPreview(reader.result);
-        if (type === 'banner') setBannerPreview(reader.result);
+        if (type === 'logo') {
+          setLogoPreview(reader.result);
+          setSettings(prev => ({ ...prev, logo: reader.result }));
+        }
+        if (type === 'banner') {
+          setBannerPreview(reader.result);
+          setSettings(prev => ({ ...prev, banner: reader.result }));
+        }
       };
       reader.readAsDataURL(file);
     }

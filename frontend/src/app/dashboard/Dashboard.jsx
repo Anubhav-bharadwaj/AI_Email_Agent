@@ -6,6 +6,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { getDashboardSummary } from '@/services/api';
+import { useAuthStore } from '@/store/authStore';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -20,15 +21,20 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 }
 };
 
-function getTimeBasedGreeting() {
+function getTimeBasedGreeting(name) {
   const hour = new Date().getHours();
-  if (hour < 12) return 'Good Morning';
-  if (hour < 18) return 'Good Afternoon';
-  return 'Good Evening';
+  const displayName = name ? `, ${name}` : '';
+  if (hour < 12) return `Good Morning${displayName}`;
+  if (hour < 18) return `Good Afternoon${displayName}`;
+  return `Good Evening${displayName}`;
 }
 
 export function Dashboard() {
   const [summary, setSummary] = useState(null);
+  const { user } = useAuthStore();
+  
+  // Extract first name from email or displayName if available
+  const firstName = user?.displayName?.split(' ')[0] || user?.email?.split('@')[0] || '';
 
   useEffect(() => {
     getDashboardSummary()
@@ -56,7 +62,7 @@ export function Dashboard() {
         <div className="absolute -top-24 -right-24 w-48 h-48 bg-accent/20 rounded-full blur-3xl pointer-events-none" />
         
         <div className="z-10">
-          <h1 className="text-3xl font-bold tracking-tight">{getTimeBasedGreeting()} 👋</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{getTimeBasedGreeting(firstName)} 👋</h1>
           <p className="text-muted-foreground mt-2 max-w-lg text-sm">
             Ready to launch your next AI campaign? You have <strong className="text-foreground">2</strong> drafts pending review.
           </p>

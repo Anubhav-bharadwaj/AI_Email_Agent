@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -6,12 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { UploadCloud, CheckCircle2, Copy, Search, Mail, Monitor, Smartphone, Type, FileCode2, Sparkles, Send, FileSpreadsheet } from 'lucide-react';
+import { UploadCloud, CheckCircle2, Copy, Search, Mail, Monitor, Smartphone, Type, FileCode2, Sparkles, Send, FileSpreadsheet, ShieldAlert, BookOpen, PenTool } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCampaignStore } from '@/store/campaignStore';
 import { uploadCsv, startGenerate, getGenerateStatus, startSend, getSendStatus } from '@/services/api';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { scoreEmail } from '@/services/scorer';
+import { Progress } from '@/components/ui/progress';
 
 const steps = [
 { id: 1, name: 'Upload', icon: UploadCloud },
@@ -25,9 +27,10 @@ export function CampaignBuilder() {
   const [isDryRun, setIsDryRun] = useState(true);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [previewMode, setPreviewMode] = useState('desktop');
-  const [viewType, setViewType] = useState('html');
+  const [viewType, setViewType] = useState('text');
   const [dragActive, setDragActive] = useState(false);
   const [selectedDraftId, setSelectedDraftId] = useState(null);
+  const [emailTone, setEmailTone] = useState('Professional');
 
   const fileInputRef = useRef(null);
 
@@ -63,7 +66,7 @@ export function CampaignBuilder() {
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
-      const { jobId } = await startGenerate(customers);
+      const { jobId } = await startGenerate(customers, emailTone);
 
       let job;
       do {
@@ -118,6 +121,17 @@ export function CampaignBuilder() {
     }
   };
 
+  const handleDraftChange = (e) => {
+    if (!selectedDraftId) return;
+    const newDrafts = drafts.map(d => {
+      if (d.id === selectedDraftId) {
+        return { ...d, bodyPlain: e.target.value };
+      }
+      return d;
+    });
+    setDrafts(newDrafts);
+  };
+
   const filteredDrafts = drafts.filter((d) => {
     const c = customers.find((cust) => cust.id === d.customerId);
     return c?.name.toLowerCase().includes(searchTerm.toLowerCase()) || c?.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -125,6 +139,7 @@ export function CampaignBuilder() {
 
   const selectedDraft = drafts.find((d) => d.id === selectedDraftId);
   const selectedCustomer = customers.find((c) => c.id === selectedDraft?.customerId);
+  const scores = selectedDraft ? scoreEmail(selectedDraft.bodyPlain) : null;
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
@@ -246,7 +261,24 @@ export function CampaignBuilder() {
                     </div>
                   </div> :
 
-              <div className="rounded-xl border border-border/50 overflow-hidden bg-background/50">
+              <div className="space-y-4">
+                <div className="flex flex-col space-y-3 bg-accent/5 p-4 rounded-xl border border-accent/20">
+                  <label className="text-sm font-semibold text-foreground">Select Global Email Tone</label>
+                  <div className="flex flex-wrap gap-2">
+                    {['Professional', 'Casual', 'Persuasive', 'Enthusiastic'].map(tone => (
+                      <Button 
+                        key={tone} 
+                        variant={emailTone === tone ? 'default' : 'outline'} 
+                        onClick={() => setEmailTone(tone)}
+                        className="rounded-full"
+                      >
+                        {tone}
+                      </Button>
+                    ))}
+                  </div>
+                  <span className="text-xs text-muted-foreground mt-1">This tone will be applied to all AI-generated drafts in this batch.</span>
+                </div>
+                <div className="rounded-xl border border-border/50 overflow-hidden bg-background/50">
                     <Table>
                       <TableHeader className="bg-muted/50">
                         <TableRow>
@@ -270,6 +302,7 @@ export function CampaignBuilder() {
                       </TableBody>
                     </Table>
                   </div>
+                </div>
               }
               </CardContent>
             </Card>
@@ -312,6 +345,49 @@ export function CampaignBuilder() {
 
             {/* Right Column: Gmail-like Preview & Controls */}
             <div className="lg:col-span-2 space-y-4">
+              {/* Scoring Panel */}
+              {scores && (
+                <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-sm p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold text-sm">AI Quality Score</h3>
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl font-bold">{scores.overall}</span>
+                      <span className="text-muted-foreground text-sm">/ 100</span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-muted-foreground flex items-center gap-1"><PenTool className="w-3 h-3" /> Professionalism</span>
+                        <span className="font-medium">{scores.professionalism}%</span>
+                      </div>
+                      <Progress value={scores.professionalism} className="h-1.5" indicatorColor="bg-blue-500" />
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-muted-foreground flex items-center gap-1"><BookOpen className="w-3 h-3" /> Clarity</span>
+                        <span className="font-medium">{scores.clarity}%</span>
+                      </div>
+                      <Progress value={scores.clarity} className="h-1.5" indicatorColor="bg-green-500" />
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-muted-foreground flex items-center gap-1"><Type className="w-3 h-3" /> Grammar</span>
+                        <span className="font-medium">{scores.grammar}%</span>
+                      </div>
+                      <Progress value={scores.grammar} className="h-1.5" indicatorColor="bg-purple-500" />
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-muted-foreground flex items-center gap-1"><ShieldAlert className="w-3 h-3" /> Spam Risk</span>
+                        <span className="font-medium">{100 - scores.spamRisk}%</span>
+                      </div>
+                      <Progress value={scores.spamRisk} className="h-1.5" indicatorColor={scores.spamRisk > 70 ? "bg-green-500" : scores.spamRisk > 40 ? "bg-yellow-500" : "bg-red-500"} />
+                    </div>
+                  </div>
+                </Card>
+              )}
+
               {/* Controls */}
               <Card className="bg-card/50 backdrop-blur-sm p-2 flex flex-col sm:flex-row justify-between items-center border-border/50">
                 <div className="flex bg-muted p-1 rounded-lg">
@@ -326,14 +402,14 @@ export function CampaignBuilder() {
                 <div className="flex items-center gap-2 mt-2 sm:mt-0">
                   <Button variant="outline" size="sm" onClick={() => setViewType((v) => v === 'html' ? 'text' : 'html')}>
                     {viewType === 'html' ? <Type className="w-4 h-4 mr-2" /> : <FileCode2 className="w-4 h-4 mr-2" />}
-                    View {viewType === 'html' ? 'Raw Text' : 'HTML'}
+                    Edit {viewType === 'html' ? 'Raw Text' : 'HTML'}
                   </Button>
                   <Button variant="outline" size="icon" className="h-9 w-9" title="Copy to clipboard"><Copy className="h-4 w-4" /></Button>
                 </div>
               </Card>
 
               {/* Email Preview */}
-              <div className="bg-background rounded-xl border border-border/50 shadow-xl overflow-hidden flex flex-col h-[500px]">
+              <div className="bg-background rounded-xl border border-border/50 shadow-xl overflow-hidden flex flex-col h-[400px]">
                 {/* Browser/Window Header */}
                 <div className="bg-muted px-4 py-3 flex items-center gap-2 border-b border-border/50">
                   <div className="flex gap-1.5">
@@ -357,8 +433,16 @@ export function CampaignBuilder() {
                     {/* Email Headers */}
                     <div className="p-5 border-b border-gray-200 dark:border-gray-800 space-y-4">
                       <div className="flex items-start justify-between">
-                        <div>
-                          <h2 className="text-xl font-bold">{selectedDraft?.subject}</h2>
+                        <div className="flex-1 mr-4">
+                          <input 
+                            type="text" 
+                            className="text-xl font-bold bg-transparent w-full border-none focus:outline-none focus:ring-1 focus:ring-accent/50 rounded px-1 -ml-1" 
+                            value={selectedDraft?.subject || ''} 
+                            onChange={(e) => {
+                              const newDrafts = drafts.map(d => d.id === selectedDraftId ? { ...d, subject: e.target.value } : d);
+                              setDrafts(newDrafts);
+                            }}
+                          />
                           <div className="flex items-center gap-2 mt-3">
                             <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center font-bold text-gray-500">Ac</div>
                             <div className="text-sm">
@@ -372,11 +456,15 @@ export function CampaignBuilder() {
                     </div>
 
                     {/* Email Body */}
-                    <div className="p-6 overflow-y-auto font-sans">
+                    <div className="p-6 font-sans flex-1 flex flex-col">
                       {viewType === 'html' ?
-                    <div dangerouslySetInnerHTML={{ __html: selectedDraft?.bodyHtml || '' }} className="prose prose-sm dark:prose-invert max-w-none" /> :
-
-                    <pre className="whitespace-pre-wrap font-mono text-sm text-gray-700 dark:text-gray-300">{selectedDraft?.bodyPlain}</pre>
+                      <div dangerouslySetInnerHTML={{ __html: selectedDraft?.bodyHtml || '' }} className="prose prose-sm dark:prose-invert max-w-none flex-1" /> :
+                      <textarea 
+                        className="w-full flex-1 resize-none bg-transparent font-mono text-sm text-gray-700 dark:text-gray-300 border-none focus:outline-none focus:ring-1 focus:ring-accent/50 p-2 rounded" 
+                        value={selectedDraft?.bodyPlain || ''}
+                        onChange={handleDraftChange}
+                        placeholder="Type your email body here..."
+                      />
                     }
                     </div>
                   </motion.div>
@@ -454,5 +542,4 @@ export function CampaignBuilder() {
         }
       </AnimatePresence>
     </div>);
-
 }
