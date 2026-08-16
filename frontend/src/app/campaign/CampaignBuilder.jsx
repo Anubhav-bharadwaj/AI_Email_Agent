@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { UploadCloud, CheckCircle2, Copy, Search, Mail, Monitor, Smartphone, Type, FileCode2, Sparkles, Send, FileSpreadsheet, ShieldAlert, BookOpen, PenTool } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCampaignStore } from '@/store/campaignStore';
-import { uploadCsv, startGenerate, getGenerateStatus, startSend, getSendStatus } from '@/services/api';
+import { uploadCsv, startGenerate, getGenerateStatus, startSend, getSendStatus, mockGetSettings } from '@/services/api';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { scoreEmail } from '@/services/scorer';
@@ -31,6 +31,11 @@ export function CampaignBuilder() {
   const [dragActive, setDragActive] = useState(false);
   const [selectedDraftId, setSelectedDraftId] = useState(null);
   const [emailTone, setEmailTone] = useState('Professional');
+  const [settings, setSettings] = useState({ companyName: 'Acme Corp', companyEmail: 'hello@acme.com' });
+
+  useEffect(() => {
+    mockGetSettings().then(setSettings);
+  }, []);
 
   const fileInputRef = useRef(null);
 
@@ -444,9 +449,11 @@ export function CampaignBuilder() {
                             }}
                           />
                           <div className="flex items-center gap-2 mt-3">
-                            <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center font-bold text-gray-500">Ac</div>
+                            <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center font-bold text-gray-500 overflow-hidden">
+                              {settings.logo ? <img src={settings.logo} alt="Logo" className="w-full h-full object-cover" /> : (settings.companyName ? settings.companyName.substring(0, 2) : 'Ac')}
+                            </div>
                             <div className="text-sm">
-                              <div className="font-semibold">Acme Corp <span className="font-normal text-gray-500">&lt;hello@acme.com&gt;</span></div>
+                              <div className="font-semibold">{settings.companyName} <span className="font-normal text-gray-500">&lt;{settings.companyEmail}&gt;</span></div>
                               <div className="text-gray-500 text-xs">to {selectedCustomer?.name}</div>
                             </div>
                           </div>
