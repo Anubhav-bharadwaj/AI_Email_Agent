@@ -38,7 +38,7 @@ def clear_campaign_history():
     connection.commit()
     connection.close()
 
-def is_already_sent(email):
+def is_already_sent(email, interest):
 
     os.makedirs("logs", exist_ok=True)
 
@@ -47,8 +47,8 @@ def is_already_sent(email):
     cursor = connection.cursor()
 
     cursor.execute(
-        "SELECT 1 FROM campaign_logs WHERE email = ? AND status = 'Sent' LIMIT 1",
-        (email,)
+        "SELECT 1 FROM campaign_logs WHERE email = ? AND interest = ? AND status = 'Sent' LIMIT 1",
+        (email, interest)
     )
 
     result = cursor.fetchone()

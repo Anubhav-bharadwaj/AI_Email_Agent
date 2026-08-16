@@ -1,168 +1,61 @@
-import pandas as pd
 import streamlit as st
-
-from modules.validator import validate_email
-from modules.email_generator import generate_email
-from modules.file_manager import save_email
-from modules.email_sender import send_email
-from modules.utils import extract_subject_and_body
-from modules.database import (get_campaign_history,clear_campaign_history,is_already_sent)
-from modules.logger import log_campaign, initialize_database
+import pandas as pd
 from modules.data_loader import validate_customer_columns
+from modules.ui import apply_custom_css, apply_card_css
+from modules.logger import initialize_database
 
 initialize_database()
 
 st.set_page_config(
-    page_title="AI Email Campaign Automation",
-    page_icon="📧",
-    layout="wide"
+    page_title="MailForge",
+    page_icon="✉️",
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
+
+apply_custom_css()
+apply_card_css()
 
 if "generated_emails" not in st.session_state:
     st.session_state.generated_emails = {}
+if "customers" not in st.session_state:
+    st.session_state.customers = None
 
-st.title("📧 AI Email Campaign Automation Agent")
+st.title("✉️ MailForge")
 
-st.write(
-    "Generate and send AI-powered personalized email campaigns."
-)
-
-uploaded_file = st.file_uploader(
-    "Upload Customer CSV",
-    type=["csv"]
-)
+# TOP: CSV UPLOAD
+st.markdown("### 1. Upload Customer Data")
+uploaded_file = st.file_uploader("Upload CSV File", type=["csv"], label_visibility="collapsed")
 
 if uploaded_file is not None:
-
     try:
         customers = pd.read_csv(uploaded_file)
         customers = validate_customer_columns(customers)
-    except pd.errors.EmptyDataError:
-        st.error("❌ The uploaded CSV is empty. Please upload a file with data.")
-        st.stop()
-    except ValueError as e:
-        st.error(f"❌ {e}")
-        st.stop()
+        customers = customers.drop_duplicates(subset="Email", keep="first")
+        st.session_state.customers = customers
+        st.success(f"✅ Loaded {len(customers)} customers successfully!")
+    except Exception as e:
+        st.error(f"❌ Error loading CSV: {e}")
 
-    customers = customers.drop_duplicates(subset="Email", keep="first")
-    st.success("CSV Loaded Successfully!")
-    
-    col1, col2 = st.columns(2)
-    col1.metric(
-        "👥 Customers",
-        len(customers)
-    )
-    col2.metric(
-        "📄 Drafts",
-        len(st.session_state.generated_emails)
-    )
-    st.dataframe(customers)
+st.write("") # Spacer
 
-    if st.button("🤖 Generate Emails"):
-        progress = st.progress(0)
-        total = len(customers)
-        st.session_state.generated_emails.clear()
-        for index, row in customers.iterrows():
-            progress.progress((index + 1) / total)
-            name = row["Name"]
-            email = row["Email"]
-            interest = row["Interest"]
+# TAB BOXES
+spacer1, col1, col2, spacer2 = st.columns([1, 3, 3, 1])
 
-            if validate_email(email):
-                try:
-                    email_text = generate_email(name, interest)
-                except Exception as e:
-                    st.warning(f"⚠️ Failed to generate email for {name} ({email}): {e}")
-                    continue
-                st.session_state.generated_emails[email] = {
-                    "name": name,
-                    "content": email_text
-                }
-                save_email(name, email_text)
+with col1:
+    st.markdown("""
+        <div class="card-icon-wrapper">🚀</div>
+        <div class="card-title">Campaign Builder</div>
+        <div class="card-desc">Generate personalized emails, preview drafts, and dispatch your campaign seamlessly.</div>
+    """, unsafe_allow_html=True)
+    if st.button("Open Builder", key="btn_builder", use_container_width=True):
+        st.switch_page("pages/1_Campaign_Builder.py")
 
-        st.success("Emails generated successfully!")
-        st.rerun()
-    st.subheader("Generated Drafts")
-    if st.session_state.generated_emails:
-        for email, draft in st.session_state.generated_emails.items():
-            with st.expander(f"📄 {draft['name']}"):
-                st.text(draft["content"])
-    else:
-        st.info("No drafts generated yet.")
-
-    dry_run = st.checkbox("🧪 Dry Run (preview only, skip actual sending)")
-    confirm_send = dry_run or st.checkbox(
-        f"🚀 I confirm I want to send {len(st.session_state.generated_emails)} real email(s) now."
-    )
-
-    if st.button(
-    "📧 Send Emails",
-    disabled=(len(st.session_state.generated_emails) == 0 or not confirm_send)
-    ):
-        
-        sent_count = 0
-        failed_count = 0
-        progress = st.progress(0)
-        total = len(customers)
-        for index, row in customers.iterrows():
-
-            progress.progress((index + 1) / total)
-
-            name = row["Name"]
-            email = row["Email"]
-            interest = row["Interest"]
-
-            if validate_email(email):
-                if is_already_sent(email):
-                    st.warning(f"⏭️ Skipping {name} ({email}) — already marked as Sent.")
-                    log_campaign(name, email, interest, "Skipped")
-                    continue
-                draft = st.session_state.generated_emails.get(email)
-                if draft is None:
-                    st.warning(f"No draft found for {name}. Please generate emails first.")
-                    continue
-                subject, body = extract_subject_and_body(draft["content"])
-
-                if dry_run:
-                    sent_count += 1
-                    st.info(f"🧪 [Dry Run] Would send to {name} ({email})")
-                elif send_email(email, subject, body):
-                    sent_count += 1
-                    log_campaign(
-                        name,
-                        email,
-                        interest,
-                        "Sent"
-                    )
-                else:
-                    failed_count += 1
-                    log_campaign(
-                        name,
-                        email,
-                        interest,
-                        "Failed"
-                    )
-
-        st.success(f"✅ {sent_count} email(s) sent!")
-
-        if failed_count > 0:
-            st.error(f"❌ {failed_count} email(s) failed.")
-        
-
-    st.divider()
-
-    if st.button("🗑 Clear History",disabled=get_campaign_history().empty):
-        clear_campaign_history()
-        st.success("Campaign history cleared!")
-        st.rerun()
-
-    st.header("📊 Campaign History")
-    history = get_campaign_history()
-    if history.empty:
-        st.info("No campaign history available.")
-    else:
-        history = history.drop(columns=["id"], errors="ignore")
-        st.dataframe(
-            history,
-            use_container_width=True
-        )
+with col2:
+    st.markdown("""
+        <div class="card-icon-wrapper">📊</div>
+        <div class="card-title">Campaign History</div>
+        <div class="card-desc">Browse through your historical campaign logs, dispatched successes, and failed emails.</div>
+    """, unsafe_allow_html=True)
+    if st.button("Open History", key="btn_history", use_container_width=True):
+        st.switch_page("pages/2_History.py")

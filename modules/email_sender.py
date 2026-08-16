@@ -1,5 +1,4 @@
 import os
-import time
 import html
 import smtplib
 import mimetypes
@@ -14,10 +13,9 @@ EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 SENDER_NAME = os.getenv("SENDER_NAME") 
 
-SMTP_SEND_DELAY_SECONDS = 2
 BANNER_IMAGE_PATH = "assets/banner.png"
 
-def send_email(receiver_email, subject, body):
+def send_email(receiver_email, subject, body, smtp_conn=None):
 
     try:
 
@@ -56,15 +54,14 @@ def send_email(receiver_email, subject, body):
             img_data, maintype=maintype, subtype=subtype, cid=banner_cid
         )
 
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
-
-            smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
-
-            smtp.send_message(msg)
+        if smtp_conn:
+            smtp_conn.send_message(msg)
+        else:
+            with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+                smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+                smtp.send_message(msg)
 
         print(f"✅ Email sent to {receiver_email}")
-        time.sleep(SMTP_SEND_DELAY_SECONDS)
-        
         return True
 
     except smtplib.SMTPException as e:

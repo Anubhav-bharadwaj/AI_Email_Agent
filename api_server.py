@@ -58,15 +58,17 @@ class SendRequest(BaseModel):
 
 class GenerateRequest(BaseModel):
     customers: List[Customer]
+    tone: str = "Professional"
 
 
-def _run_generate_job(job_id, customers):
+def _run_generate_job(job_id, customers, tone):
+    import time
     drafts = []
     errors = []
 
     for customer in customers:
         try:
-            ai_email = generate_email(customer["name"], customer["interest"])
+            ai_email = generate_email(customer["name"], f"{customer['interest']} ({tone} tone)")
             subject, body = extract_subject_and_body(ai_email)
             save_email(customer["name"], ai_email)
 
@@ -96,33 +98,61 @@ def _run_send_job(job_id, customers, drafts, is_dry_run):
     failed = 0
     skipped = 0
 
-    for draft in drafts:
-        customer = customer_map.get(draft["customerId"])
-        if not customer:
-            failed += 1
+    smtp_conn = None
+    if not is_dry_run:
+        try:
+            import smtplib
+            import os
+            from dotenv import load_dotenv
+            load_dotenv()
+            
+            EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
+            EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+            
+            smtp_conn = smtplib.SMTP_SSL("smtp.gmail.com", 465)
+            smtp_conn.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+            print(f"✅ SMTP connection established for job {job_id}")
+        except Exception as e:
+            print(f"❌ Failed to connect to SMTP: {e}")
+            send_jobs[job_id]["status"] = "failed"
+            return
+
+    try:
+        for draft in drafts:
+            customer = customer_map.get(draft["customerId"])
+            if not customer:
+                failed += 1
+                send_jobs[job_id]["completed"] += 1
+                continue
+
+            email = customer["email"]
+            name = customer["name"]
+            interest = customer["interest"]
+
+            if is_already_sent(email, interest):
+                skipped += 1
+                log_campaign(name, email, interest, "Skipped")
+                send_jobs[job_id]["completed"] += 1
+                continue
+
+            if is_dry_run:
+                sent += 1
+            elif send_email(email, draft["subject"], draft["bodyPlain"], smtp_conn=smtp_conn):
+                sent += 1
+                log_campaign(name, email, interest, "Sent")
+            else:
+                failed += 1
+                log_campaign(name, email, interest, "Failed")
+
             send_jobs[job_id]["completed"] += 1
-            continue
 
-        email = customer["email"]
-        name = customer["name"]
-        interest = customer["interest"]
-
-        if is_already_sent(email):
-            skipped += 1
-            log_campaign(name, email, interest, "Skipped")
-            send_jobs[job_id]["completed"] += 1
-            continue
-
-        if is_dry_run:
-            sent += 1
-        elif send_email(email, draft["subject"], draft["bodyPlain"]):
-            sent += 1
-            log_campaign(name, email, interest, "Sent")
-        else:
-            failed += 1
-            log_campaign(name, email, interest, "Failed")
-
-        send_jobs[job_id]["completed"] += 1
+    finally:
+        if smtp_conn:
+            try:
+                smtp_conn.quit()
+                print(f"✅ SMTP connection closed for job {job_id}")
+            except Exception as e:
+                print(f"❌ Error closing SMTP connection: {e}")
 
     send_jobs[job_id]["status"] = "done"
     send_jobs[job_id]["sent"] = sent
@@ -199,7 +229,7 @@ def start_generate(payload: GenerateRequest):
         "errors": [],
     }
 
-    thread = threading.Thread(target=_run_generate_job, args=(job_id, customers), daemon=True)
+    thread = threading.Thread(target=_run_generate_job, args=(job_id, customers, payload.tone), daemon=True)
     thread.start()
 
     return {"jobId": job_id}
