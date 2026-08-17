@@ -8,6 +8,7 @@ import { CampaignBuilder } from '@/app/campaign/CampaignBuilder';
 import { History } from '@/app/history/History';
 import { Analytics } from '@/app/analytics/Analytics';
 import { Settings } from '@/app/settings/Settings';
+import { Landing } from '@/app/landing/Landing';
 import { Login } from '@/app/auth/Login';
 import { useAuthStore } from '@/store/authStore';
 
@@ -29,7 +30,7 @@ function ProtectedRoute({ children }) {
   }
   
   if (!user) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
   
   return children;
@@ -48,14 +49,15 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+          <Route path="/" element={<Landing />} />
+          <Route path="/dashboard" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
             <Route index element={<Dashboard />} />
             <Route path="campaign" element={<CampaignBuilder />} />
             <Route path="history" element={<History />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="settings" element={<Settings />} />
-            <Route path="*" element={<NotFound />} />
           </Route>
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
       <Toaster position="bottom-right" theme="dark" />

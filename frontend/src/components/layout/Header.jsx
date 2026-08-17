@@ -13,6 +13,7 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [hasNotifications, setHasNotifications] = useState(true);
+  const [imgError, setImgError] = useState(false);
   const navigate = useNavigate();
 
   const handleSearch = (e) => {
@@ -77,8 +78,8 @@ export function Header() {
             onClick={() => setIsProfileOpen(!isProfileOpen)}
             className="flex items-center gap-2 hover:opacity-80 transition-opacity outline-none rounded-full focus-visible:ring-2 focus-visible:ring-ring"
           >
-            {user?.photoURL ? (
-              <img src={user.photoURL} alt="Profile" className="w-8 h-8 rounded-full border border-border/50 object-cover" />
+            {user?.photoURL && !imgError ? (
+              <img src={user.photoURL} alt="Profile" className="w-8 h-8 rounded-full border border-border/50 object-cover" onError={() => setImgError(true)} />
             ) : (
               <div className="w-8 h-8 rounded-full border border-border/50 bg-primary/10 text-primary flex items-center justify-center font-semibold text-sm">
                 {user?.email?.charAt(0).toUpperCase() || <User className="w-4 h-4 text-muted-foreground" />}

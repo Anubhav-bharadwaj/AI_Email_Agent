@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, PlusCircle, History, BarChart, Settings, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, History, BarChart, Settings, Sparkles, ChevronLeft, ChevronRight, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 
 const navItems = [
-{ name: 'Dashboard', path: '/', icon: LayoutDashboard },
-{ name: 'New Campaign', path: '/campaign', icon: PlusCircle },
-{ name: 'Analytics', path: '/analytics', icon: BarChart },
-{ name: 'History', path: '/history', icon: History },
-{ name: 'Settings', path: '/settings', icon: Settings },
+{ name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+{ name: 'New Campaign', path: '/dashboard/campaign', icon: PlusCircle },
+{ name: 'Analytics', path: '/dashboard/analytics', icon: BarChart },
+{ name: 'History', path: '/dashboard/history', icon: History },
+{ name: 'Settings', path: '/dashboard/settings', icon: Settings },
 { name: 'Streamlit App', path: 'http://localhost:8501', icon: Sparkles, external: true }];
 
 export function Sidebar() {
@@ -25,8 +25,8 @@ export function Sidebar() {
       
       <div className="h-16 flex items-center px-4 border-b border-border/50 justify-between">
         <div className="flex items-center overflow-hidden whitespace-nowrap">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 relative overflow-hidden bg-background border border-border/50">
-            <img src="/logo.jpg" alt="MailForge Logo" className="w-full h-full object-cover" />
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-accent-hover flex items-center justify-center shrink-0 relative overflow-hidden shadow-sm">
+            <Mail className="w-4 h-4 text-white" />
           </div>
           {!isCollapsed &&
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center ml-3">
@@ -77,7 +77,7 @@ export function Sidebar() {
               );
             }
             
-            const isActive = location.pathname === item.path || item.path !== '/' && location.pathname.startsWith(item.path);
+            const isActive = location.pathname === item.path || (item.path !== '/dashboard' && location.pathname.startsWith(item.path));
             return (
               <Link
                 key={item.path}
