@@ -7,7 +7,7 @@ load_dotenv()
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-GROQ_MODEL = "llama-3.3-70b-versatile"
+GROQ_MODEL = "openai/gpt-oss-120b"
 GROQ_REQUEST_DELAY_SECONDS = 4
 
 def generate_email(name, interest):
@@ -31,6 +31,10 @@ def generate_email(name, interest):
 
         if not text:
             raise ValueError("empty response")
+
+        # Strip out <think>...</think> blocks if the model outputs reasoning tokens
+        import re
+        text = re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL).strip()
 
         return text
     except ValueError:
