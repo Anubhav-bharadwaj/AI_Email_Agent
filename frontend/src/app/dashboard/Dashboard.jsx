@@ -73,10 +73,10 @@ export function Dashboard() {
           </p>
         </div>
         <div className="flex items-center gap-3 z-10">
-          <Link to="/analytics" className={buttonVariants({ variant: 'outline' })}>
+          <Link to="/dashboard/analytics" className={buttonVariants({ variant: 'outline' })}>
             View Analytics
           </Link>
-          <Link to="/campaign" className={buttonVariants({ variant: 'premium', className: 'group' })}>
+          <Link to="/dashboard/campaign" className={buttonVariants({ variant: 'premium', className: 'group' })}>
             Create Campaign
             <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
